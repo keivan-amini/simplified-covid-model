@@ -3,7 +3,7 @@
 """
 Created on Wed Mar  2 10:38:19 2022
 
-@author: giulio
+@author: Giulio Colombini
 """
 
 import numpy as np
@@ -12,7 +12,7 @@ from   tqdm  import tqdm
 
 # Social activity rate
 # The example is a quite strong lockdown 14 days after the introduction of patient zero.
-m_test = (np.array([0., 14, np.inf]), np.array([1., .25 , .25]))
+m_test = (np.array([0., 14, 20, np.inf]), np.array([1., .5, .15, .5]))
 
 # Symptomatic fraction
 alpha_test = (np.array([0., np.inf]), np.array([.14, .14]))
@@ -71,6 +71,7 @@ def run_simulation(days = 60, dt = 1./24., beta = 1/1.2, N = 886891, m = m_test,
     I = np.zeros(max_step+1)
     A = np.zeros(max_step+1)
     R = np.zeros(max_step+1)
+    TOT = np.zeros(max_step+1)
     
     Phi_SE = np.zeros(max_step+1)
     Phi_EI = np.zeros(max_step+1)
@@ -112,7 +113,8 @@ def run_simulation(days = 60, dt = 1./24., beta = 1/1.2, N = 886891, m = m_test,
     
     # Add initial population to Susceptibles
     
-    S[0] = N
+    S[0]   = N
+    TOT[0] = N
     
     # Add patient zero to flow
     
@@ -159,11 +161,11 @@ def run_simulation(days = 60, dt = 1./24., beta = 1/1.2, N = 886891, m = m_test,
         I[t+1] = I[t] + Phi_EI[t] - Phi_IR[t]
         A[t+1] = A[t] + Phi_EA[t] - Phi_AR[t]
         R[t+1] = R[t] + Phi_IR[t] + Phi_AR[t]
-        
+        TOT[t+1] = S[t+1] + E[t+1] + I[t+1] + A[t+1] + R[t+1]
     t = np.array([t for t in range(max_step+1)])
-    return (t, S, E, I, A, R)
+    return (t, S, E, I, A, R, TOT)
 
-t,s,e,i,a,r = run_simulation()
+t,s,e,i,a,r, tot = run_simulation()
 #%% Graphics
 from matplotlib import pyplot as plt
 
@@ -174,6 +176,8 @@ plt.plot(t * dt,e, label = 'E')
 plt.plot(t * dt,i, label = 'I')
 plt.plot(t * dt,a, label = 'A')
 plt.plot(t * dt,r, label = 'R')
+# plt.plot(t * dt, tot, label = 'TOT')
+
 
 plt.legend()
 plt.grid(True)
