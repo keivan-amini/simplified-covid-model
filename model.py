@@ -66,6 +66,57 @@ def run_simulation(days = 60, dt = 1./24., beta = 1/1.2, alpha = .14,
                     N = 886891, m = m_test, gamma = gamma_test, 
                     pars_e = pars_e_test, pars_i = pars_i_test, 
                     pars_h = pars_h_test, pars_a = pars_a_test):
+    '''
+    Launch a simulation of the epidemic using the specified parameters.
+
+    Parameters
+    ----------
+    days : float, optional
+        Number of days to simulate. The default is 60.
+    dt : float, optional
+        Timestep, expressed as a fraction of day. The default is 1./24..
+    beta : float, optional
+        Infection probability. The default is 1/1.2.
+    alpha : float, optional
+        Probability of manifesting symptoms. The default is .14.
+    N : float or int, optional
+        Total population in the model. The default is 886891.
+    m : tuple of np.arrays, optional
+        Days in which mobility is changed and the mobility value to consider 
+        up to the next change. The last value in the days array MUST be np.inf, 
+        with a repeated final value in the second one. The default is m_test.
+    gamma : tuple of np.arrays, optional
+        Same rules as m but for the hospitalisation ratio. The default is gamma_test.
+    pars_e : tuple of np.arrays, optional
+        Same rules as m but with format (days, means, standard_deviations) for the Exposed
+        exit distribution. The default is pars_e_test.
+    pars_i : tuple of np.arrays, optional
+        Same as pars_e but for the Infected category. The default is pars_i_test.
+    pars_h : tuple of np.arrays, optional
+        Same as pars_e but for the Hospitalised category. The default is pars_h_test.
+    pars_a : tuple of np.arrays, optional
+        Same as pars_e but for the Asymptomatic category. The default is pars_a_test.
+
+    Returns
+    -------
+    t : np.array
+        Simulation timestamps.
+    S : np.array
+        Time series for the Susceptibles compartment.
+    E : np.array
+        Time series for the Exposed compartment.
+    I : np.array
+        Time series for the Infected compartment.
+    H : np.array
+        Time series for the Hospitalised compartment.
+    A : np.array
+        Time series for the Asymptomatic compartment.
+    R : np.array
+        Time series for the Removed compartment.
+    TOT : np.array
+        Time series for the sum of all compartments, to check consistency.
+
+    '''
     # Calculate number of iterations
     max_step = int(np.rint(days / dt))
     
@@ -182,25 +233,30 @@ def run_simulation(days = 60, dt = 1./24., beta = 1/1.2, alpha = .14,
     t = np.array([t for t in range(max_step+1)])
     return (t, S, E, I, H, A, R, TOT)
 
-t,s,e,i,h,a,r,tot = run_simulation(100)
+def test_model(days = 100, dt = 1/48):
+    print("Simulate", days, "days with a {:.2f}".format(dt), "day resolution.")
+    print("The example is a quite strong lockdown 30 days after the introduction of patient zero.")
+    t,s,e,i,h,a,r,tot = run_simulation(days = 100, dt = dt)
 #%% Graphics
-from matplotlib import pyplot as plt
+    from matplotlib import pyplot as plt
+     
+    plt.figure("Simulation test")
+    plt.plot(t * dt,s, label = 'S', linewidth = .5)
+    plt.plot(t * dt,e, label = 'E', linewidth = .5)
+    plt.plot(t * dt,i, label = 'I', linewidth = .5)
+    plt.plot(t * dt,h, label = 'H', linewidth = .5)
+    plt.plot(t * dt,a, label = 'A', linewidth = .5)
+    plt.plot(t * dt,r, label = 'R', linewidth = .5)
+    #plt.plot(t * dt, tot, label = 'TOT')
+    
+    plt.legend()
+    plt.grid(True)
+    plt.ylim(bottom = 0, top = 2000)
+    plt.xlim([0, max(t * dt)])
+    plt.xlabel('Days since patient zero introduction')
+    plt.ylabel('People')
+    
+    plt.show()
 
-dt = 1/24
-
-plt.plot(t * dt,s, label = 'S', linewidth = .5)
-plt.plot(t * dt,e, label = 'E', linewidth = .5)
-plt.plot(t * dt,i, label = 'I', linewidth = .5)
-plt.plot(t * dt,h, label = 'H', linewidth = .5)
-plt.plot(t * dt,a, label = 'A', linewidth = .5)
-plt.plot(t * dt,r, label = 'R', linewidth = .5)
-#plt.plot(t * dt, tot, label = 'TOT')
-
-plt.legend()
-plt.grid(True)
-plt.ylim(bottom = 0, top = 2000)
-plt.xlim([0, max(t * dt)])
-plt.xlabel('Days since patient zero introduction')
-plt.ylabel('People')
-
-plt.show()
+if __name__ == "__main__":
+    test_model()
