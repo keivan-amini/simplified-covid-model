@@ -6,7 +6,7 @@ This script has been written in order to find some "mobility parameter" that cou
 @author: Keivan Amini
 
 """
-
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -37,7 +37,7 @@ ordered_df = df.sort_values(by = 'data')
 col_list= ['0000 0100', '0100 0200', '0200 0300', "0300 0400" , "0400 0500" , "0500 0600" , "0600 0700" , "0700 0800" , "0800 0900" , "0900 1000" , "1000 1100" , "1100 1200" , "1200 1300" , "1300 1400" , "1400 1500" , "1500 1600" , "1600 1700" , "1700 1800" , "1800 1900" , "1900 2000" , "2000 2100" , "2100 2200" , "2200 2300" , "2300 2400"] 
 ordered_df['Average Daily Mobility'] = ordered_df[col_list].sum(axis=1) / 24
 
-days = list(range(1,367))
+days = list(range(1,367)) # 2020 had 366 days
 casalecchio_mobility = ordered_df.loc[ordered_df["Nome via"] == "TANGENZIALE CASALECCHIO-SAN LAZZARO", "Average Daily Mobility"]
 
 assert len(days) == len(casalecchio_mobility), "Something is wrong"
@@ -49,3 +49,21 @@ plt.xlabel('Days from 1 January 2020')
 plt.ylabel('Average number of motor vehicle detected')
 plt.title('Mobility vs Time in Tangenziale Casalecchio - San Lazzaro (BO) during 2020')
 plt.show()
+
+# Are the geopoints always the same? Do they change?
+trial_df = ordered_df.loc[ordered_df["data"] == "2020-01-01"] # dataset regarding the first day
+assert len(pd.unique(df['longitudine'])) == len(pd.unique(trial_df['longitudine'])), "Geopoint are not in the same position everyday"
+
+# Let's try to reconstruct an array called Average Monthly Mobolity.
+# Each element of the array is associated with a certain geopoint. Let's start from January.
+january_days= ['2020-01-01','2020-01-02','2020-01-03','2020-01-04','2020-01-05'
+,'2020-01-06','2020-01-07','2020-01-08','2020-01-09','2020-01-10'
+,'2020-01-11','2020-01-12','2020-01-13','2020-01-14','2020-01-15'
+,'2020-01-16','2020-01-17','2020-01-18','2020-01-19','2020-01-20'
+,'2020-01-21','2020-01-22','2020-01-23','2020-01-24','2020-01-25'
+,'2020-01-26','2020-01-27','2020-01-28','2020-01-29','2020-01-30'
+,'2020-01-31']
+
+january_df =  ordered_df[ordered_df['data'].isin(january_days)]
+
+TODO
