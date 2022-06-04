@@ -65,5 +65,19 @@ january_days= ['2020-01-01','2020-01-02','2020-01-03','2020-01-04','2020-01-05'
 ,'2020-01-31']
 
 january_df =  ordered_df[ordered_df['data'].isin(january_days)]
+simpler_df = january_df[['geopoint','Average Daily Mobility']]
+
+simpler_df = pd.pivot_table(
+    simpler_df,
+    index='geopoint',
+    aggfunc=np.sum,
+    fill_value=0,
+    
+)
+
+simpler_df = simpler_df.reset_index()
+
+simpler_df = simpler_df.rename(columns={"Average Daily Mobility": "Total Monthly Mobility"})
+simpler_df['Average Monthly Mobility'] = simpler_df['Total Monthly Mobility'] / 31 # number of days
 
 TODO
