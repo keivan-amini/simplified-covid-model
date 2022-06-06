@@ -63,7 +63,7 @@ def propagate_forward(t, max_t, donor, acceptors, kernel_tuple, branching_ratios
         a[t + i0 : t + i0 + lk] += r * buffer
 
 def run_simulation(days = 60, dt = 1./24., beta = 1/1.2, alpha = .14, 
-                    N = 886891, m = m_test, gamma = gamma_test, 
+                    N = 886891, norm = False, m = m_test, gamma = gamma_test, 
                     pars_e = pars_e_test, pars_i = pars_i_test, 
                     pars_h = pars_h_test, pars_a = pars_a_test):
     '''
@@ -81,6 +81,8 @@ def run_simulation(days = 60, dt = 1./24., beta = 1/1.2, alpha = .14,
         Probability of manifesting symptoms. The default is .14.
     N : float or int, optional
         Total population in the model. The default is 886891.
+    norm : bool, optional
+        Normalise populations if True, otherwise keep numbers unnormalised. The default is False.
     m : tuple of np.arrays, optional
         Days in which mobility is changed and the mobility value to consider 
         up to the next change. The last value in the days array MUST be np.inf, 
@@ -176,13 +178,18 @@ def run_simulation(days = 60, dt = 1./24., beta = 1/1.2, alpha = .14,
     rho_as = [discrete_gamma(mu, sigma) for mu, sigma in zip(rho_a_mus, rho_a_sigmas)]
     
     # Add initial population to Susceptibles
-    
-    S[0]   = N
-    TOT[0] = N
+    if norm:
+        S[0]   = 1
+        TOT[0] = 1
+    else:
+        S[0]   = N
+        TOT[0] = N
     
     # Add patient zero to flow
-    
-    Phi_SE[0] += 1.
+    if norm:
+        Phi_SE[0] += 1./N
+    else:
+        Phi_SE[0] += 1.
     
     # Intialize indices for distribution selection
     
@@ -233,10 +240,10 @@ def run_simulation(days = 60, dt = 1./24., beta = 1/1.2, alpha = .14,
     t = np.array([t for t in range(max_step+1)])
     return (t, S, E, I, H, A, R, TOT)
 
-def test_model(days = 100, dt = 1/48):
+def test_model(days = 100, dt = 1/48, norm = False):
     print("Simulate", days, "days with a {:.2f}".format(dt), "day resolution.")
     print("The example is a quite strong lockdown 30 days after the introduction of patient zero.")
-    t,s,e,i,h,a,r,tot = run_simulation(days = 100, dt = dt)
+    t,s,e,i,h,a,r,tot = run_simulation(days = 100, dt = dt, norm = norm)
 #%% Graphics
     from matplotlib import pyplot as plt
      
@@ -251,7 +258,12 @@ def test_model(days = 100, dt = 1/48):
     
     plt.legend()
     plt.grid(True)
-    plt.ylim(bottom = 0, top = 2000)
+    if norm:
+        plt.ylim(bottom = 0, top = 0.002255)
+        plt.ylabel('Population Fraction')
+    else:
+        plt.ylim(bottom = 0, top = 2000)
+        plt.ylabel('People')
     plt.xlim([0, max(t * dt)])
     plt.xlabel('Days since patient zero introduction')
     plt.ylabel('People')
@@ -259,4 +271,4 @@ def test_model(days = 100, dt = 1/48):
     plt.show()
 
 if __name__ == "__main__":
-    test_model()
+    test_model(norm = True)
