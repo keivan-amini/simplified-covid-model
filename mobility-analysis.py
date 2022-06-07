@@ -11,7 +11,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-# Upload the Mobility-Dataset 
+# Upload the Mobility-Dataset **WARNING: occasionaly could give a KeyError: 'data' since Pandas mess up the name of the first column. FIXME
 url = 'https://github.com/keivan-amini/simplified-covid-model/blob/main/rilevazione-autoveicoli-tramite-spire-anno-2020_header_mod.csv?raw=true'
 df = pd.read_csv(url,index_col=0)
 
@@ -42,11 +42,17 @@ casalecchio_mobility = ordered_df.loc[ordered_df["Nome via"] == "TANGENZIALE CAS
 
 assert len(days) == len(casalecchio_mobility), "Something is wrong"
 
-plt.plot(days, casalecchio_mobility,label = 'Tangenziale Casalecchio - San Lazzaro', color='green', linewidth = 1) 
-plt.axvline(x=70, color='b', ls='--', label='31 marzo 2020') # start of the first italian lockdown
-plt.axvline(x=125, color='b', ls='--', label='4 maggio 2020') # end lockdown
-plt.xlabel('Days from 1 January 2020')
-plt.ylabel('Average number of motor vehicle detected')
+# Let's consider a moving average
+raw = casalecchio_mobility.to_numpy()
+smoothed_ts = casalecchio_mobility.rolling(7, center=True).mean()
+
+plt.scatter(days,raw/raw.max(), label = 'Raw data', color ='green', marker = "^", s = 4) # normalized to 1
+plt.scatter(days,smoothed_ts/smoothed_ts.max(), label = "Moving average based on 7 days", color = "red", marker = "o", s = 4)
+plt.axvline(x=70, color='b', ls='--', label='Lockdown') # start of the first italian lockdown
+plt.axvline(x=125, color='b', ls='--') # end lockdown
+plt.xlabel('Number of days from 1 January 2020')
+plt.ylabel('Average number of motor vehicle detected normalized')
+plt.legend(loc="lower right")
 plt.title('Mobility vs Time in Tangenziale Casalecchio - San Lazzaro (BO) during 2020')
 plt.show()
 
@@ -102,3 +108,9 @@ ax.set_ylim(Bounding_Box_Jan[2],Bounding_Box_Jan[3])
 ax.imshow(mappa_bologna, zorder=0, extent = Bounding_Box_Jan, aspect= 'equal')
 plt.show()
 
+"""
+TODO
+# fare media totale di tutti i dati sulla mobilità:
+# asse x: tempo
+# asse y: mobilità totale (somma considerando tutti i luoghi)
+"""
