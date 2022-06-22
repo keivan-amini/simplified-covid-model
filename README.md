@@ -26,8 +26,20 @@ First of all, we coded a six compartment SIR model, containing:
 - R, Removed compartment.
 
 Of course in the equations we take into account the social activity rate. 
-
-The example is a quite strong lockdown 30 days after the introduction of patient zero:
+In the example it is reported a a quite strong lockdown 30 days after the introduction of patient zero:
 <p align="center">
-  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_0.png?raw=true" align="centre" height="400" width="600"  alt="SIR model"/>
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_0-.png?raw=true" align="centre" height="400" width="600"  alt="SIR model"/>
 </p>
+
+In the analyzed dataset, we started figuring out the geographical position of the autoveichles detectors. In this image, every blue circle corresponds to an autoveichles detector.
+<p align="center">
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_1.png?raw=true" align="centre" height="500" width="1500"  alt="map"/>
+</p>
+
+We also tried to figure out which streets were more busy. In order to do that, as an example we just focused on the January 2020 dataframe and we performed a scatter plot with the size of the points related to an *Average Monthly Mobility* coefficient. To better understand it, I suggest to look at the written code ```mobility-analysis.py```. However, the result is the following.
+<p align="center">
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_3.png?raw=true" align="centre" height="500" width="1500"  alt="map"/>
+</p>
+
+After that, we focused on an interesting street: the so-called *Tangenziale Casalecchio - San Lazzaro*
+TODO
