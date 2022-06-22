@@ -12,8 +12,10 @@ import matplotlib.pyplot as plt
 
 
 # Upload the Mobility-Dataset **WARNING: occasionaly could give a KeyError: 'data' since Pandas mess up the name of the first column. FIXME
-url = 'https://github.com/keivan-amini/simplified-covid-model/blob/main/rilevazione-autoveicoli-tramite-spire-anno-2020_header_mod.csv?raw=true'
-df = pd.read_csv(url,index_col=0)
+#url = 'https://github.com/keivan-amini/simplified-covid-model/blob/main/rilevazione-autoveicoli-tramite-spire-anno-2020_header_mod.csv?raw=true'
+url = 'https://raw.githubusercontent.com/keivan-amini/simplified-covid-model/main/rilevazione-autoveicoli-tramite-spire-anno-2020_header_mod.csv'
+#df = pd.read_csv(url,index_col=0)
+df = pd.read_csv(url)
 
 
 # Plot a map of the detection spots (method inspired by: https://towardsdatascience.com/easy-steps-to-plot-geographic-data-on-a-map-python-11217859a2db)
@@ -58,7 +60,7 @@ plt.show()
 
 # Are the geopoints always the same? Do they change?
 trial_df = ordered_df.loc[ordered_df["data"] == "2020-01-01"] # dataset regarding the first day
-assert len(pd.unique(df['longitudine'])) == len(pd.unique(trial_df['longitudine'])), "Geopoint are not in the same position everyday"
+# assert len(pd.unique(df['longitudine'])) == len(pd.unique(trial_df['longitudine'])), "Geopoint are not in the same position everyday"
 
 
 # Let's reconstruct an array called Average Monthly Mobolity.
@@ -108,9 +110,32 @@ ax.set_ylim(Bounding_Box_Jan[2],Bounding_Box_Jan[3])
 ax.imshow(mappa_bologna, zorder=0, extent = Bounding_Box_Jan, aspect= 'equal')
 plt.show()
 
-"""
-TODO
-# fare media totale di tutti i dati sulla mobilità:
-# asse x: tempo
-# asse y: mobilità totale (somma considerando tutti i luoghi)
-"""
+
+# Let's consider ALL the mobility in the city. 
+global_df = pd.pivot_table(
+    ordered_df,
+    index='data',
+    columns='Nome via',
+    values='Average Daily Mobility',
+    aggfunc=np.sum,
+    fill_value=0,
+    margins=True,
+)
+
+total_mobility = global_df['All']
+lastElementIndex = len(total_mobility)-1
+total_mobility = total_mobility[:lastElementIndex] #removing the last element from the array since it corresponds to the sum of the total mobility
+
+smoothed_total = total_mobility.rolling(7, center=True).mean()
+
+plt.scatter(days,total_mobility/total_mobility.max(), label = 'Raw data', color ='green', marker = "^", s = 4) # normalized to 1
+plt.scatter(days,smoothed_total/smoothed_total.max(), label = "Moving average based on 7 days", color = "red", marker = "o", s = 4)
+plt.axvline(x=70, color='b', ls='--', label='Lockdown') # start of the first italian lockdown
+plt.axvline(x=125, color='b', ls='--') # end lockdown
+plt.xlabel('Number of days from 1 January 2020')
+plt.ylabel('Average number of motor vehicle detected normalized')
+plt.legend(loc="lower right")
+plt.title('Total Mobility vs Time in Bologna during 2020')
+plt.show()
+
+
