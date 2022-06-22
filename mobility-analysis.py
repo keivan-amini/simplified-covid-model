@@ -138,4 +138,11 @@ plt.legend(loc="lower right")
 plt.title('Total Mobility vs Time in Bologna during 2020')
 plt.show()
 
-
+# comparison
+fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(5, 3))
+ax1.set_title('Mobility in Tangenziale Casalecchio - San Lazzaro (BO)')
+ax1.scatter(days, smoothed_ts, s=5)
+ax2.set_title('Total Mobility in Bologna')
+ax2.scatter(days, smoothed_total, s=5)
+fig.tight_layout()
+plt.show()
