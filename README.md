@@ -33,13 +33,20 @@ In the example it is reported a a quite strong lockdown 30 days after the introd
 
 In the analyzed dataset, we started figuring out the geographical position of the autoveichles detectors. In this image, every blue circle corresponds to an autoveichles detector.
 <p align="center">
-  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_1.png?raw=true" align="centre" height="500" width="1500"  alt="map"/>
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_1.png?raw=true" align="centre" height="500" width="1650"  alt="map"/>
 </p>
 
 We also tried to figure out which streets were more busy. In order to do that, as an example we just focused on the January 2020 dataframe and we performed a scatter plot with the size of the points related to an *Average Monthly Mobility* coefficient. To better understand it, I suggest to look at the written code ```mobility-analysis.py```. However, the result is the following.
 <p align="center">
-  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_3.png?raw=true" align="centre" height="500" width="1500"  alt="map"/>
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_3.png?raw=true" align="centre" height="500" width="1650"  alt="map"/>
 </p>
 
-After that, we focused on an interesting street: the so-called *Tangenziale Casalecchio - San Lazzaro*
-TODO
+After that, we focused on an interesting street: the so-called **Tangenziale Casalecchio - San Lazzaro**. This street is a well-busy freeway that you need to cross in order to get on the highway and travel towards different cities.
+In this freeway we considered the number of autoveichles detected every day during 2020, as we can see in the following image.
+<p align="center">
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_2.png?raw=true" align="centre" height="500" width="1650"  alt="map"/>
+</p>
+
+In this plot we have on the *y axis* the average number of motor veichle detected normalized to one, meanwhile on the *x axis* we have the number of days passed from the 1st January of 2020. Here we have two data:
+- the **green triangles** are associated with the raw data, meaning that we can have fluctuations mainly caused by the rythm of the week, i.e. from monday to friday a lot of workers will drive on the street, but not in the weekend.
+- the **red dots** are associated to a **Moving Average** based on seven days. The moving average is defined as: TODO and it is a method that allows as to make our data smoother. We simply implemented it by using the function ```pandas.DataFrame.rolling```.
