@@ -58,6 +58,6 @@ More generally we decided to study this behaviour considering the average of the
   <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_4.png?raw=true" align="centre" height="500" width="1650"  alt="map"/>
 </p>
 <p align="center">
-  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_5.png?raw=true" align="centre" height="300" width="1650"  alt="map"/>
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_5.png?raw=true" align="centre" height="500" width="1750"  alt="map"/>
 </p>
 As we expected, the general case is characterized by a smoother curve since it is forced to consider a bigger amount of data; but the the general behaviour and the dynamics of the time series is almost the same.
