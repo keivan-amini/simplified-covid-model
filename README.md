@@ -49,4 +49,14 @@ In this freeway we considered the number of autoveichles detected every day duri
 
 In this plot we have on the *y axis* the average number of motor veichle detected normalized to one, meanwhile on the *x axis* we have the number of days passed from the 1st January of 2020. Here we have two data:
 - the **green triangles** are associated with the raw data, meaning that we can have fluctuations mainly caused by the rythm of the week, i.e. from monday to friday a lot of workers will drive on the street, but not in the weekend.
-- the **red dots** are associated to a **Moving Average** based on seven days. The moving average is defined as: TODO and it is a method that allows as to make our data smoother. We simply implemented it by using the function ```pandas.DataFrame.rolling```.
+- the **red dots** are associated to a **Moving Average** based on seven days. More generally, the moving average over the last *k* data points is defined as: $$MA_{k} =  \frac{p_{n-k+1}+p_{n-k+2}+...+p_n}{k} = \frac{1}{k} \sum_{i=n-k+1}^n p_i $$ where *n* is the number of entries in the dataset and $k = 7$ in our case. With this method we are able to make our data look "smoother", and we simply implemented it by using the function ```pandas.DataFrame.rolling```.
+Between the **blue dashed line** we have the first italian lockdown, started the 9th March of 2020 and ended the 18th May 2020. As we expected, in this period we can see an important decrease of the average city mobility.
+
+More generally we decided to study this behaviour considering the average of the total mobility in the city of Bologna for all the 292 streets included in the dataset. After that, we have also compared the specific and the general case.
+<p align="center">
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_4.png?raw=true" align="centre" height="500" width="1650"  alt="map"/>
+</p>
+<p align="center">
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_5.png?raw=true" align="centre" height="500" width="1650"  alt="map"/>
+</p>
+As we expected, the general case is characterized by a smoother curve since it is forced to consider a bigger amount of data; but the the general behaviour and the dynamics of the time series is almost the same.
