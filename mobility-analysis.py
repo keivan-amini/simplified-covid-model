@@ -50,8 +50,8 @@ smoothed_ts = casalecchio_mobility.rolling(7, center=True).mean()
 
 plt.scatter(days,raw/raw.max(), label = 'Raw data', color ='green', marker = "^", s = 4) # normalized to 1
 plt.scatter(days,smoothed_ts/smoothed_ts.max(), label = "Moving average based on 7 days", color = "red", marker = "o", s = 4)
-plt.axvline(x=70, color='b', ls='--', label='Lockdown') # start of the first italian lockdown
-plt.axvline(x=125, color='b', ls='--') # end lockdown
+plt.axvline(x=70, color='b', ls='--', label='Lockdown') # start of the first italian lockdown, 9th march
+plt.axvline(x=125, color='b', ls='--') # end lockdown, 18th may
 plt.xlabel('Number of days from 1 January 2020')
 plt.ylabel('Average number of motor vehicle detected normalized')
 plt.legend(loc="lower right")
@@ -130,8 +130,12 @@ smoothed_total = total_mobility.rolling(7, center=True).mean()
 
 plt.scatter(days,total_mobility/total_mobility.max(), label = 'Raw data', color ='green', marker = "^", s = 4) # normalized to 1
 plt.scatter(days,smoothed_total/smoothed_total.max(), label = "Moving average based on 7 days", color = "red", marker = "o", s = 4)
-plt.axvline(x=70, color='b', ls='--', label='Lockdown') # start of the first italian lockdown
-plt.axvline(x=125, color='b', ls='--') # end lockdown
+plt.axvline(x=70, color='b', ls='--', label='1st Lockdown') # start of the first italian lockdown, 9th march
+plt.axvline(x=125, color='b', ls='--') # end lockdown, 18th may
+plt.axvline(x=286, color='c', ls='--', label='Start of the 2nd wave') # start of the second wave, 13th october, mandatory mask
+#plt.axvline(x=291, color='c', ls='--') # 18th october: chiusura scuola e università
+plt.axvline(x=297, color='y', ls='--', label='Closure of activities') # 24th october: chiusura attività
+plt.axvline(x=319, color='m', ls='--', label = 'Night curfew and zone colours') # 3th november, curfew, introduzione dei colori
 plt.xlabel('Number of days from 1 January 2020')
 plt.ylabel('Average number of motor vehicle detected normalized')
 plt.legend(loc="lower right")
@@ -146,3 +150,7 @@ ax2.set_title('Total Mobility in Bologna')
 ax2.scatter(days, smoothed_total, s=5)
 fig.tight_layout()
 plt.show()
+
+# Now lets try to compare morning, afternoon and night: I would define morning 6-10 AM, 16-20 PM, 20-00 PM
+
+TODO
