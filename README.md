@@ -55,7 +55,7 @@ Between the **blue dashed line** we have the first italian lockdown, started the
 
 More generally we decided to study this behaviour considering the average of the total mobility in the city of Bologna for all the 292 streets included in the dataset. After that, we have also compared the specific and the general case.
 <p align="center">
-  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_4.png?raw=true" align="centre" height="500" width="1650"  alt="map"/>
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_6.png?raw=true" align="centre" height="500" width="1650"  alt="map"/>
 </p>
 <p align="center">
   <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_5.png?raw=true" align="centre" height="500" width="1750"  alt="map"/>
