@@ -151,6 +151,59 @@ ax2.scatter(days, smoothed_total, s=5)
 fig.tight_layout()
 plt.show()
 
-# Now lets try to compare morning, afternoon and night: I would define morning 6-10 AM, 16-20 PM, 20-00 PM
+#------------------
+# Now lets clean the dataset in order to compare morning, afternoon and night.
 
-TODO
+del ordered_df['codice spira']
+del ordered_df['Livello']
+del ordered_df['codimpsem']
+del ordered_df['angolo']
+del ordered_df['geopoint']
+del ordered_df['Giorno della settimana']
+del ordered_df['Average Daily Mobility']
+del ordered_df['latitudine']
+del ordered_df['longitudine']
+del ordered_df['codice']
+del ordered_df['ordinanza']
+del ordered_df['id_uni']
+del ordered_df['Nodo da']
+del ordered_df['direzione']
+del ordered_df['stato']
+del ordered_df['codice arco']
+del ordered_df['codice via']
+del ordered_df['Nome via']
+del ordered_df['tipologia']
+del ordered_df['Nodo a']
+
+hourly_df = ordered_df.groupby('data').sum()
+
+morning = ['0600 0700', '0700 0800', '0800 0900', '0900 1000']
+afternoon = ['1600 1700', '1700 1800', '1800 1900', '1900 2000']
+night = ['2000 2100', '2100 2200', '2200 2300', '2300 2400']
+
+morning_mobility = hourly_df[morning].sum(axis=1)
+afternoon_mobility = hourly_df[afternoon].sum(axis=1)
+night_mobility = hourly_df[night].sum(axis=1)
+
+smoothed_morning = morning_mobility.rolling(7, center=True).mean()
+smoothed_afternoon = afternoon_mobility.rolling(7, center=True).mean()
+smoothed_night = night_mobility.rolling(7, center=True).mean()
+
+with plt.style.context('Solarize_Light2'):
+        plt.grid(False)
+        #plt.scatter(days,morning_mobility/morning_mobility.max(), label = 'Raw data', color ='green', marker = "^", s = 4) # normalized to 1
+        plt.scatter(days,smoothed_morning/smoothed_morning.max(), label = "Morning Mobility 6-10 AM", color = "red", marker = "o", s = 4)
+        plt.scatter(days,smoothed_afternoon/smoothed_afternoon.max(), label = "Afternoon Mobility 4-8 PM", color = "g", marker = "o", s = 4)
+        plt.scatter(days,smoothed_night/smoothed_night.max(), label = "Night Mobility 9-00 PM", color = "k", marker = "o", s = 4)
+        plt.axvline(x=70, color='b', ls='--', label='1st Lockdown') # start of the first italian lockdown, 9th march
+        plt.axvline(x=125, color='b', ls='--') # end lockdown, 18th may
+        plt.axvline(x=286, color='c', ls='--', label='Start of the 2nd wave') # start of the second wave, 13th october, mandatory mask
+#plt.axvline(x=291, color='c', ls='--') # 18th october: chiusura scuola e università
+        plt.axvline(x=297, color='y', ls='--', label='Closure of activities') # 24th october: chiusura attività
+        plt.axvline(x=319, color='m', ls='--', label = 'Night curfew and zone colours') # 3th november, curfew, introduzione dei colori
+        plt.xlabel('Number of days from 1 January 2020', color = 'k')
+        plt.ylabel('Average number of motor vehicle detected normalized', color = 'k')
+        plt.legend(loc="lower right")
+        plt.title('Time Slots Mobility vs Time in Bologna during 2020')
+        
+plt.show()
