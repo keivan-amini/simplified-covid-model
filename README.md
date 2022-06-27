@@ -28,23 +28,23 @@ First of all, we coded a six compartment SIR model, containing:
 Of course in the equations we take into account the social activity rate. 
 In the example it is reported a a quite strong lockdown 30 days after the introduction of patient zero:
 <p align="center">
-  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_0-.png?raw=true" align="centre" height="400" width="600"  alt="SIR model"/>
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_0-.png?raw=true" align="centre" alt="SIR model"/>
 </p>
 
 In the analyzed dataset, we started figuring out the geographical position of the autoveichles detectors. In this image, every blue circle corresponds to an autoveichles detector.
 <p align="center">
-  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_1.png?raw=true" align="centre" height="500" width="1650"  alt="map"/>
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_1.png?raw=true" align="centre"   alt="map"/>
 </p>
 
 We also tried to figure out which streets were more busy. In order to do that, as an example we just focused on the January 2020 dataframe and we performed a scatter plot with the size of the points related to an *Average Monthly Mobility* coefficient. To better understand it, I suggest to look at the written code ```mobility-analysis.py```. However, the result is the following.
 <p align="center">
-  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_3.png?raw=true" align="centre" height="500" width="1650"  alt="map"/>
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_3.png?raw=true" align="centre"   alt="map"/>
 </p>
 
 After that, we focused on an interesting street: the so-called **Tangenziale Casalecchio - San Lazzaro**. This street is a well-busy freeway that you need to cross in order to get on the highway and travel towards different cities.
 In this freeway we considered the number of autoveichles detected every day during 2020, as we can see in the following image.
 <p align="center">
-  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_2.png?raw=true" align="centre" height="500" width="1650"  alt="map"/>
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_2.png?raw=true" align="centre"   alt="map"/>
 </p>
 
 In this plot we have on the *y axis* the average number of motor veichle detected normalized to one, meanwhile on the *x axis* we have the number of days passed from the 1st January of 2020. Here we have two data:
@@ -55,9 +55,22 @@ Between the **blue dashed line** we have the first italian lockdown, started the
 
 More generally we decided to study this behaviour considering the average of the total mobility in the city of Bologna for all the 292 streets included in the dataset. After that, we have also compared the specific and the general case.
 <p align="center">
-  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_6.png?raw=true" align="centre" height="500" width="1650"  alt="map"/>
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_6.png?raw=true" align="centre"  alt="map"/>
 </p>
 <p align="center">
-  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_5.png?raw=true" align="centre" height="500" width="1750"  alt="map"/>
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_5.png?raw=true" align="centre"   alt="map"/>
 </p>
 As we expected, the general case is characterized by a smoother curve since it is forced to consider a bigger amount of data; but the the general behaviour and the dynamics of the time series is almost the same.
+
+------------------------------------------------------
+### Time Slots Mobility
+
+We procedeed by analyzing the time slots mobility, i.e. the behaviour of the mobility in different timeslots of the day. Here we considered three main timeslots:
+- Morning 06:00 - 10:00
+- Afternoon 16:00 - 20:00
+- Night 20:00 - 00:00
+
+<p align="center">
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_8.png?raw=true" align="centre" alt="map"/>
+</p>
+
