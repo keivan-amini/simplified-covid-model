@@ -9,6 +9,8 @@ This script has been written in order to find some "mobility parameter" that cou
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 
 
 # Upload the Mobility-Dataset **WARNING: occasionaly could give a KeyError: 'data' since Pandas mess up the name of the first column. FIXME
@@ -151,7 +153,58 @@ ax2.scatter(days, smoothed_total, s=5)
 fig.tight_layout()
 plt.show()
 
-#------------------
+#--------------------------------------------
+#--------------------------------------------
+
+# Urban vs Suburban Mobility & Time slots Mobility
+
+borders = [(44.505796, 11.339432), #coordinate geografiche dei confini del centro di bologna
+(44.499409, 11.326833),
+(44.490256, 11.329385),
+(44.486264, 11.339472),
+(44.484313, 11.356326),
+(44.485729, 11.358204),
+(44.501035, 11.356401),
+(44.504251, 11.348351)]
+polygon = Polygon(borders)
+
+geopoint = pd.unique(ordered_df['geopoint'])
+bool = [0] * len(geopoint) #vettore che dovrà contenere True se la coordinata geografica è all'interno del centro di Bologna e False viceversa
+
+for coordinate, index in zip(geopoint, range(len(geopoint))):
+        tupla = tuple(map(float, coordinate.split(',')))
+        punto = Point(tupla)
+        bool[index] = polygon.contains(punto)
+        
+series = pd.Series(bool)
+
+frame = { 'Geopoint': geopoint, 'Boolean': series }
+central_df = pd.DataFrame(frame) #creazione del dataframe
+urban_df = central_df.query("Boolean==True")
+suburban_df = central_df.query("Boolean==False")
+
+#We have now splitted the geopoint. Now the idea is to analyze the mobility.
+urban_geopoint_array = urban_df["Geopoint"].str.split(",", n = 1, expand = True)
+
+longitudine_urban = urban_geopoint_array[0].values
+longitudine_urban = longitudine_urban.astype(float)
+
+latitudine_urban = urban_geopoint_array[1].values
+latitudine_urban = latitudine_urban.astype(float)
+
+#draw a polygon that rapresents the border of the centre
+borders.append(borders[0]) #repeat the first point to create a 'closed loop'
+xs, ys = zip(*borders) #create lists of x and y values
+plt.figure()
+plt.plot(xs,ys, color= "r", linewidth="3") 
+plt.scatter(longitudine_urban,latitudine_urban)
+plt.title('Urban detector coordinates')
+plt.xlabel('Longitudine')
+plt.ylabel('Latitudine')
+plt.show()
+
+# TODO: urban mobility, suburban plot, suburban mobility and a unique plot containing all this 4 informations.
+
 # Now lets clean the dataset in order to compare morning, afternoon and night.
 
 del ordered_df['codice spira']
