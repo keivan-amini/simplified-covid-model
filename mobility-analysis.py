@@ -185,25 +185,134 @@ suburban_df = central_df.query("Boolean==False")
 
 #We have now splitted the geopoint. Now the idea is to analyze the mobility.
 urban_geopoint_array = urban_df["Geopoint"].str.split(",", n = 1, expand = True)
+suburban_geopoint_array = suburban_df["Geopoint"].str.split(",", n = 1, expand = True)
 
 longitudine_urban = urban_geopoint_array[0].values
 longitudine_urban = longitudine_urban.astype(float)
-
 latitudine_urban = urban_geopoint_array[1].values
 latitudine_urban = latitudine_urban.astype(float)
+
+longitudine_suburban = suburban_geopoint_array[0].values
+longitudine_suburban = longitudine_suburban.astype(float)
+latitudine_suburban = suburban_geopoint_array[1].values
+latitudine_suburban = latitudine_suburban.astype(float)
 
 #draw a polygon that rapresents the border of the centre
 borders.append(borders[0]) #repeat the first point to create a 'closed loop'
 xs, ys = zip(*borders) #create lists of x and y values
+
 plt.figure()
-plt.plot(xs,ys, color= "r", linewidth="3") 
-plt.scatter(longitudine_urban,latitudine_urban)
+plt.plot(ys,xs, color= "r", linewidth="3") 
+plt.scatter(latitudine_urban,longitudine_urban)
 plt.title('Urban detector coordinates')
 plt.xlabel('Longitudine')
 plt.ylabel('Latitudine')
+plt.xlim([df.longitudine.min(), df.longitudine.max()])
+plt.ylim([df.latitudine.min(), df.latitudine.max()])
 plt.show()
 
-# TODO: urban mobility, suburban plot, suburban mobility and a unique plot containing all this 4 informations.
+plt.figure()
+plt.plot(ys,xs, color= "r", linewidth="3") 
+plt.scatter(latitudine_suburban,longitudine_suburban)
+plt.title('Suburban detector coordinates')
+plt.xlabel('Longitudine')
+plt.ylabel('Latitudine')
+plt.xlim([df.longitudine.min(), df.longitudine.max()])
+plt.ylim([df.latitudine.min(), df.latitudine.max()])
+
+plt.show()
+
+# now lets plot just the urban mobility. In order to do that i have to cut the dataset just for some geopoints.
+#---------------prova
+geopoint_urbani = urban_df['Geopoint']
+geopoint_suburbani = suburban_df['Geopoint']
+
+list_urban_geopoint = geopoint_urbani.tolist()
+list_suburban_geopoint = geopoint_suburbani.tolist()
+
+suburban_df = ordered_df[~ordered_df['geopoint'].isin(list_urban_geopoint)]
+urban_df = ordered_df[~ordered_df['geopoint'].isin(list_suburban_geopoint)]
+
+urban_df = pd.pivot_table(
+    urban_df,
+    index='data',
+    columns= 'geopoint',
+    values='Average Daily Mobility',
+    aggfunc=np.sum,
+    fill_value=0,
+    margins=True,
+)
+suburban_df = pd.pivot_table(
+    suburban_df,
+    index='data',
+    columns= 'geopoint',
+    values='Average Daily Mobility',
+    aggfunc=np.sum,
+    fill_value=0,
+    margins=True,
+)
+
+urban_mobility = urban_df['All']
+suburban_mobility = suburban_df['All']
+
+lastElementIndex = len(urban_mobility)-1
+
+urban_mobility = urban_mobility[:lastElementIndex]
+suburban_mobility = suburban_mobility[:lastElementIndex]
+
+smoothed_urban = urban_mobility.rolling(7, center=True).mean()
+smoothed_suburban = suburban_mobility.rolling(7, center=True).mean()
+
+#plt.scatter(days,urban_mobility/urban_mobility.max(), label = 'Urban Mobility', color ='green', marker = "^", s = 4) # normalized to 1
+plt.scatter(days,smoothed_suburban/smoothed_suburban.max(), label = "Suburban Mobility", color = "orangered", marker = "o", s = 4)
+plt.scatter(days,smoothed_urban/smoothed_urban.max(), label = "Urban Mobility", color = "limegreen", marker = "o", s = 4)
+plt.axvline(x=70, color='b', ls='--', label='Lockdown') # start of the first italian lockdown
+plt.axvline(x=125, color='b', ls='--') # end lockdown
+plt.axvline(x=286, color='c', ls='--', label='Start of the 2nd wave') # start of the second wave, 13th october, mandatory mask
+#plt.axvline(x=291, color='c', ls='--') # 18th october: chiusura scuola e università
+plt.axvline(x=297, color='y', ls='--', label='Closure of activities') # 24th october: chiusura attività
+plt.axvline(x=319, color='m', ls='--', label = 'Night curfew and zone colours') # 3th november, curfew, introduzione dei colori
+plt.xlabel('Number of days from 1 January 2020')
+plt.ylabel('Average number of motor vehicle detected normalized')
+plt.legend(loc="lower right")
+plt.title('Urban and Suburban Mobility vs Time in Bologna during 2020')
+plt.show()
+
+##not normalized
+plt.scatter(days,smoothed_suburban, label = "Suburban Mobility", color = "orangered", marker = "o", s = 4)
+plt.scatter(days,smoothed_urban, label = "Urban Mobility", color = "limegreen", marker = "o", s = 4)
+plt.axvline(x=70, color='b', ls='--', label='Lockdown') # start of the first italian lockdown
+plt.axvline(x=125, color='b', ls='--') # end lockdown
+plt.axvline(x=286, color='c', ls='--', label='Start of the 2nd wave') # start of the second wave, 13th october, mandatory mask
+#plt.axvline(x=291, color='c', ls='--') # 18th october: chiusura scuola e università
+plt.axvline(x=297, color='y', ls='--', label='Closure of activities') # 24th october: chiusura attività
+plt.axvline(x=319, color='m', ls='--', label = 'Night curfew and zone colours') # 3th november, curfew, introduzione dei colori
+plt.xlabel('Number of days from 1 January 2020')
+plt.ylabel('Average number of motor vehicle detected')
+plt.legend(loc="lower right")
+plt.title('Urban and Suburban Mobility (NOT NORMALIZED) vs Time in Bologna during 2020')
+plt.show()
+
+# Graphical comparison between coordinates and mobility.
+fig, axs = plt.subplots(2, 2)
+
+axs[0, 0].scatter(latitudine_urban, longitudine_urban, s = 1.2)
+axs[0, 0].plot(ys,xs, color= "r", linewidth="3")
+axs[0,0].set_xlim([df.longitudine.min(), df.longitudine.max()])
+axs[0,0].set_ylim([df.latitudine.min(), df.latitudine.max()])
+axs[0, 0].set_title('Urban detector coordinates')
+
+axs[1, 0].scatter(latitudine_suburban, longitudine_suburban, s = 1.2, color = "green")
+axs[1, 0].plot(ys,xs, color= "r", linewidth="3")
+axs[1, 0].set_title('Suburban detector coordinates')
+
+axs[0, 1].scatter(days,smoothed_urban, s = 1.2)
+axs[0, 1].set_title('Urban mobility vs Time')
+
+axs[1, 1].scatter(days, smoothed_suburban, s = 1.2, color = "green")
+axs[1, 1].set_title('Suburban mobility vs Time')
+
+plt.show()
 
 # Now lets clean the dataset in order to compare morning, afternoon and night.
 
