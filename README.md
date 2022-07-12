@@ -74,3 +74,11 @@ We procedeed by analyzing the time slots mobility, i.e. the behaviour of the mob
   <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_8.png?raw=true" align="centre" alt="map"/>
 </p>
 
+
+### Urban vs Suburban Mobility
+
+Then we procedeed by analyzing the urban vs suburban mobility; for which we considered "urban" the area of the centre of Bologna, enclosed by the "Porte di Bologna".
+
+<p align="center">
+  <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_15.png?raw=true" align="centre" alt="map"/>
+</p>
