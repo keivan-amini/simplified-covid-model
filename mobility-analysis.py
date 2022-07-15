@@ -411,6 +411,10 @@ plt.axvline(x=286, color='c', ls='--', label='Start of the 2nd wave') # start of
 plt.axvline(x=297, color='y', ls='--', label='Closure of activities') # 24th october: chiusura attività
 plt.axvline(x=319, color='m', ls='--', label = 'Night curfew and zone colours') # 3th november, curfew, introduzione dei colori
 plt.axvline(x=366, color='darkturquoise', ls='dotted', label = 'End of the year')
+plt.axvline(x=418, color='orange', ls='dotted', label = 'Emilia-Romagna zona arancione') #21 febbraio
+plt.axvline(x=440, color='r', ls='dotted', label = 'Emilia-Romagna zona rossa') #15 marzo
+plt.axvline(x=468, color='orange', ls='dotted', label = 'Emilia-Romagna zona arancione') #12 aprile
+plt.axvline(x=482, color='y', ls='dotted', label = 'Emilia-Romagna zona gialla') #26 aprile
 plt.xlabel('Number of days from 1 January 2020')
 plt.ylabel('Average number of motor vehicle detected normalized')
 plt.legend(loc="lower right")
@@ -464,3 +468,27 @@ plt.legend(loc="lower right")
 plt.show()
 
 
+
+####### PROVA per fare un unico vettore (normalizzazione 2020-2021 corretta)
+"""
+vector = np.concatenate((smoothed_total,smoothed_total_2021))
+print(vector)
+print(vector.max())
+unione = vector/np.nanmax(vector)
+print(unione)
+giorni = np.concatenate((days,days2021))
+
+
+plt.scatter(giorni,unione, label = "Mobility", color = "green", marker = "o", s = 4)
+plt.scatter(m_days,m_vals, label = 'Social Activity', color ='deeppink', marker = "+", s = 60) # normalized to 1
+plt.axvline(x=366, color='darkturquoise', ls='dotted', label = 'End of the year')
+plt.title('Mobility & Sociality (shifted) vs Time')
+plt.axvspan(155, 366, facecolor='lightsalmon', alpha=0.3,label = 'Shift = +' + str(round(shift_1,2)))
+plt.axvspan(366,434, facecolor='lightgreen', alpha=0.3,label = 'Shift = +' + str(round(shift_1+shift_2,2)))
+plt.axvspan(434, 534, facecolor='lightsalmon', alpha=0.3)
+plt.axvspan(534, 731 , facecolor='yellow', alpha=0.2, label = 'Shift = +' + str(round(shift_1+shift_3,2)))
+plt.xlabel('Number of days from 1 January 2020')
+plt.ylabel('Average number of motor vehicle detected normalized')
+plt.legend(loc="lower right")
+plt.show()
+"""
