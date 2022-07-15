@@ -9,10 +9,13 @@ Created on Wed Mar  2 10:38:19 2022
 import numpy as np
 from   scipy import stats
 from   tqdm  import tqdm
+from getmobility import get_mobility
 
 # Social activity rate
 # The example is a quite strong lockdown 30 days after the introduction of patient zero.
-m_test = (np.array([0, 30, 60, np.inf]), np.array([1., .15, .15, .5]))
+
+m_test = get_mobility('https://raw.githubusercontent.com/keivan-amini/simplified-covid-model/main/rilevazione-autoveicoli-tramite-spire-anno-2020_header_mod.csv')
+#m_test = (np.array([0, 30, 60, np.inf]), np.array([1., .15, .15, .5]))
 
 # Hospitalisation fraction of symptomatic patients
 gamma_test = (np.array([0., np.inf]), np.array([.85, .5]))
