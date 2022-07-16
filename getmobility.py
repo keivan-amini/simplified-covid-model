@@ -52,12 +52,9 @@ def get_mobility(url):
 
 
     days = np.append(days, np.inf) # added inf as last element.
-    mobility = np.append(mobility, mobility.mean()) #FIXME: added as last element the mean of the mobility, since mobility and days must be the same size
+    mobility = np.append(mobility, mobility[-1]) #added last element to the mobility array, since mobility and days must be the same size
 
     m = (days, mobility) 
     
     return m
-
-
-
 
