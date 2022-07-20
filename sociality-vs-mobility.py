@@ -90,7 +90,7 @@ for index in range(7,21): # dall'ottavo elemento in poi shifto tutti i valori di
 plt.scatter(days,total_mobility, label = "Mobility", color = "green", marker = "o", s = 4)
 plt.scatter(m_days, m_vals, label = 'Social Activity', color ='deeppink', marker = "+", s = 60) # normalized to 1
 plt.axvline(x=366, color='darkturquoise', ls='dotted', label = 'End of the year')
-plt.axvspan(153, 431, facecolor='lightsalmon', alpha=0.2,label = 'Shift = +' + str(round(shift_1,2)))
+plt.axvspan(153, 490, facecolor='lightsalmon', alpha=0.2,label = 'Shift = +' + str(round(shift_1,2)))
 plt.legend(loc="lower right")
 plt.title('Mobility & Sociality (shifted) vs Time')
 plt.show()
@@ -102,7 +102,7 @@ for index in range(24,len(m_vals)):
 plt.scatter(days,total_mobility, label = "Mobility", color = "green", marker = "o", s = 4)
 plt.scatter(m_days, m_vals, label = 'Social Activity', color ='deeppink', marker = "+", s = 60) # normalized to 1
 plt.axvline(x=366, color='darkturquoise', ls='dotted', label = 'End of the year')
-plt.axvspan(153, 431, facecolor='lightsalmon', alpha=0.2,label = 'Shift = +' + str(round(shift_1,2)))
+plt.axvspan(153, 490, facecolor='lightsalmon', alpha=0.2,label = 'Shift = +' + str(round(shift_1,2)))
 plt.axvspan(602, 912, facecolor='yellow', alpha=0.2,label = 'Shift = +' + str(round(shift_2,2)))
 plt.legend(loc="lower right")
 plt.title('Mobility & Sociality (shifted) vs Time')
