@@ -1,8 +1,13 @@
-# Sociality vs Mobility code. Data considered: 2020, 2021, 2022.
+"""
+This code has two aim:
+1) Study sociality vs mobility, considering Bologna's traffic data of 2020, 2021, 2022.
+2) Study the error measurements coming from the 7-days moving average, removing those data and performing an interpolation to fill the missing elements in the mobility array.
+"""
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import scipy.interpolate as interpolate
 
 # Social activity rate
 m_vals = np.array([1.00, 1.00, 1.00, 0.24, 0.16, 0.17, 0.18, 0.24, 0.24, 0.24, 0.34, 0.24, 0.21, 0.27, 0.25, 0.23, 0.29, 0.26, 0.20, 0.39, 0.29, 0.65, 0.49, 0.35, 0.29, 0.24, 0.19, 0.25, 0.06, 0.08, 0.18, 0.21, 0.18, 0.12, 0.08, 0.06])
@@ -68,7 +73,6 @@ days = np.delete(days, index_of_nan) # deleting days associated with NaN values
 
 total_mobility = smoothed_total/smoothed_total.max() #normalization
 
-
 #Plots
 plt.scatter(days, total_mobility, label = "Mobility", color = "green", marker = "o", s = 4)
 plt.scatter(m_days, m_vals, label = 'Social Activity', color ='deeppink', marker = "+", s = 60)
@@ -107,3 +111,86 @@ plt.axvspan(602, 912, facecolor='yellow', alpha=0.2,label = 'Shift = +' + str(ro
 plt.legend(loc="lower right")
 plt.title('Mobility & Sociality (shifted) vs Time')
 plt.show()
+
+# ---------------------------------------------------------------------
+# Let's study the anomalous data given by the 7-days moving average (we may see sometimes 7 consecutive data shifted), in order to make our data smoother.
+
+def get_wrong_measurements(index_list):
+    
+    '''
+    Function that marks the shifted measurements.
+
+            Parameters:
+                    index_list (list): list containing the first index of the total_mobility array in which wrong measurement start.
+            Return:
+                    errors_days (array): array containing the days related with the wrong mesurement.
+                    errors_total_mobility (array) : array containing the values of the wrong measurements.
+
+    '''
+
+    window = []
+    for element in index_list:
+        window += range(element, element + 7)
+    return days[window], total_mobility[window]
+
+index_list = [19, 97, 147, 243, 454, 512, 527, 635, 663, 700, 747, 777, 876]
+errors_days, errors_total_mobility = get_wrong_measurements(index_list)
+
+plt.scatter(days,total_mobility, label = "Mobility", color = "green", marker = "o", s = 4)
+plt.scatter(errors_days,errors_total_mobility, label = "Mobility wrong measurements", color = "red", marker = "o", s = 4)
+plt.legend(loc="lower right")
+plt.title('Mobility vs Time')
+plt.show()
+
+# remove the shifted data
+index_to_remove = []
+for element in index_list:
+    index_to_remove += range(element, element + 7)
+
+total_mobility = np.delete(total_mobility, index_to_remove)
+days = np.delete(days, index_to_remove)
+    
+#------------------------------------------
+# Interpolation of the (now) missing data.
+
+#operate a shift: necessary to correctly fill the missing point.
+index_to_remove = [element+4 for element in index_to_remove]
+
+def interpolation(x, y, kind):
+    
+    '''
+    Given x, y, and type of the interpolation, perform the scatter interpolation in specific areas of the plot, and return x and y array with both orginal data and interpolation.
+
+            Parameters:
+                    x (np.array): 1-D array containing x values (here, days)
+                    y (np.array): 1-D array containing y values (here, mobility)
+                    kind (str): string that specifies the kind of interpolation, like "linear", "cubic", "quadratic" etc.
+            Return:
+                    x (np.array): 1-D array containing x original data + interpolation.
+                    y (np.array) : 1-D array containing y original data + interpolation.
+
+    '''
+
+    function = interpolate.interp1d(x, y, kind)
+
+    new_x = index_to_remove
+    interpolated_y = function(new_x)
+
+    plt.scatter(days,total_mobility, label = "Original", color = "green", marker = "o", s = 4)
+    plt.scatter(new_x, interpolated_y, label = str(kind) + " interpolation", color = 'red', marker = "o", s = 4)
+    plt.legend(loc="lower right")
+    plt.xlabel('Number of days from 1 January 2020')
+    plt.ylabel('Average number of motor vehicle detected normalized')
+    plt.title(str(kind) + " Interpolation in the missing point")
+    plt.show()
+    
+    y = np.append(y, interpolated_y)
+    x = np.append(x, new_x)
+
+    return x, y
+
+
+days, total_mobility = interpolation(days, total_mobility, kind = "linear")
+interpolation(days, total_mobility, kind = "quadratic")
+interpolation(days, total_mobility, kind = "cubic")
+
