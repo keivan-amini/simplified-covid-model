@@ -13,9 +13,8 @@ from getmobility import get_mobility
 
 # Social activity rate
 # The example is a quite strong lockdown 30 days after the introduction of patient zero.
-
-m_test = get_mobility('https://raw.githubusercontent.com/keivan-amini/simplified-covid-model/main/rilevazione-autoveicoli-tramite-spire-anno-2020_header_mod.csv')
-#m_test = (np.array([0, 30, 60, np.inf]), np.array([1., .15, .15, .5]))
+m_test = (np.array([0, 30, 60, np.inf]), np.array([1., .15, .15, .5]))
+m_imported = get_mobility('https://raw.githubusercontent.com/keivan-amini/simplified-covid-model/main/rilevazione-autoveicoli-tramite-spire-anno-2020_header_mod.csv')
 
 # Hospitalisation fraction of symptomatic patients
 gamma_test = (np.array([0., np.inf]), np.array([.85, .5]))
@@ -66,7 +65,7 @@ def propagate_forward(t, max_t, donor, acceptors, kernel_tuple, branching_ratios
         a[t + i0 : t + i0 + lk] += r * buffer
 
 def run_simulation(days = 60, dt = 1./24., beta = 1/1.2, alpha = .14, 
-                    N = 886891, norm = False, m = m_test, gamma = gamma_test, 
+                    N = 886891, norm = False, m = m_imported, gamma = gamma_test, 
                     pars_e = pars_e_test, pars_i = pars_i_test, 
                     pars_h = pars_h_test, pars_a = pars_a_test):
     '''
@@ -251,12 +250,12 @@ def test_model(days = 100, dt = 1/48, norm = False):
     from matplotlib import pyplot as plt
      
     plt.figure("Simulation test")
-    plt.plot(t * dt,s, label = 'S', linewidth = .5)
-    plt.plot(t * dt,e, label = 'E', linewidth = .5)
-    plt.plot(t * dt,i, label = 'I', linewidth = .5)
-    plt.plot(t * dt,h, label = 'H', linewidth = .5)
-    plt.plot(t * dt,a, label = 'A', linewidth = .5)
-    plt.plot(t * dt,r, label = 'R', linewidth = .5)
+    plt.plot(t * dt,s, label = 'S', linewidth = 2)
+    plt.plot(t * dt,e, label = 'E', linewidth = 2)
+    plt.plot(t * dt,i, label = 'I', linewidth = 2)
+    plt.plot(t * dt,h, label = 'H', linewidth = 2)
+    plt.plot(t * dt,a, label = 'A', linewidth = 2)
+    plt.plot(t * dt,r, label = 'R', linewidth = 2)
     #plt.plot(t * dt, tot, label = 'TOT')
     
     plt.legend()
