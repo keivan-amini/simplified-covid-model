@@ -3,7 +3,6 @@ The purpose of this code is to implement a function useful to export a np.array 
 
 """
 
-from operator import index
 import pandas as pd
 import numpy as np
 
