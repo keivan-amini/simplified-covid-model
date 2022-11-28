@@ -61,136 +61,143 @@ mobility2021 = get_total_mobility(url_2021)
 mobility2022 = get_total_mobility(url_2022)
 days = np.arange(1, 912) #912 is given by 366 + 365 + 181 (since the 2022 df finishes at 30th June)
 
-total_mobility = pd.concat([mobility2020,mobility2021,mobility2022], ignore_index=True)
-smoothed_total = total_mobility.rolling(7, center=True).mean() #rolling mean
+total_mobility_raw = pd.concat([mobility2020,mobility2021,mobility2022], ignore_index=True)
+smoothed_total = total_mobility_raw.rolling(7, center=True).mean()
 
-# Rolling mean outputs NaN values as first and last element of the array. Let's clean this.
-smoothed_total = smoothed_total.to_numpy()
-index_of_nan = np.argwhere(np.isnan(smoothed_total))
+#-------------------------------------------------
+# Finding and removing the outliers.
+index_list = [17, 96, 97, 103, 109, 147, 243, 355, 360, 361, 362, 365, 453, 454, 512, 527, 634, 635, 662, 663, 700, 746, 777, 876]
 
-smoothed_total = np.delete(smoothed_total,index_of_nan) #removing NaN values from the array
-days = np.delete(days, index_of_nan) # deleting days associated with NaN values
+def find_outliers(index_list, n=7):
+    '''
+    Function that find outliers data in this specific scenario.
+            Parameters:
+                    index_list (list): list containing the first index of the total_mobility array in which wrong measurement start.
+                    n (scalar): window size in the moving average. 7 if not specified.
+            Return:
+                    index_outliers (array): array containing the index related to the outliers in the total_mobility_raw array.
+    '''
+    index_outliers = [element+(n-1) for element in index_list]
+    return index_outliers
 
-total_mobility = smoothed_total/smoothed_total.max() #normalization
+index_outliers = find_outliers(index_list)
 
-#Plots
-plt.scatter(days, total_mobility, label = "Mobility", color = "green", marker = "o", s = 4)
-plt.scatter(m_days, m_vals, label = 'Social Activity', color ='deeppink', marker = "+", s = 60)
-plt.axvline(x=366, color='darkturquoise', ls='dotted', label = 'End of the year')
-plt.axvline(x=731, color='darkturquoise', ls='dotted', label = 'End of the year')
-plt.title('2020-2022 Mobility vs Time')
-plt.xlabel('Number of days from 1 January 2020')
-plt.ylabel('Average number of motor vehicle detected normalized')
-plt.legend(loc="lower right")
-plt.show()
+# Remove the outliers from total_mobility_raw array
+total_mobility_raw = np.array(total_mobility_raw)
+total_mobility_clean = np.delete(total_mobility_raw,index_outliers)
+days_clean = np.delete(days,index_outliers) # so we can perform interpolation.
+
+# Interpolation
+function = interpolate.interp1d(days_clean, total_mobility_clean, "linear")
+new_x = index_outliers
+interpolated_y = function(new_x) 
+
+# Neatly insert interpolated_y into y
+for element,index in zip(interpolated_y,new_x):
+    total_mobility_clean = np.insert(total_mobility_clean, index, element)
+
+# Moving average
+total_mobility_clean = pd.Series(total_mobility_clean) 
+final_mobility_smoothed = total_mobility_clean.rolling(7, center=True).mean()
+
+# Removing NaN
+final_mobility_smoothed = final_mobility_smoothed.to_numpy()
+index_of_nan = np.argwhere(np.isnan(final_mobility_smoothed))
+final_mobility_smoothed = np.delete(final_mobility_smoothed,index_of_nan) 
+days = np.delete(days, index_of_nan) 
+
+# Normalization.
+final_mobility_smoothed = final_mobility_smoothed/final_mobility_smoothed.max() 
+print(final_mobility_smoothed)
+print(len(final_mobility_smoothed)) #consider the first 361 elements for the simulation
+final_mobility_smoothed_simulation = final_mobility_smoothed[0:361]
+print(final_mobility_smoothed_simulation)
+print(len(final_mobility_smoothed_simulation))
 
 
-#Shifts
-shift_1 = total_mobility[165] - m_vals[7] #165 -> 14 giugno
 
-for index in range(7,21): # dall'ottavo elemento in poi shifto tutti i valori di 0,57
-        m_vals[index] += shift_1
 
-plt.scatter(days,total_mobility, label = "Mobility", color = "green", marker = "o", s = 4)
-plt.scatter(m_days, m_vals, label = 'Social Activity', color ='deeppink', marker = "+", s = 60) # normalized to 1
-plt.axvline(x=366, color='darkturquoise', ls='dotted', label = 'End of the year')
-plt.axvspan(153, 490, facecolor='lightsalmon', alpha=0.2,label = 'Shift = +' + str(round(shift_1,2)))
-plt.legend(loc="lower right")
-plt.title('Mobility & Sociality (shifted) vs Time')
-plt.show()
 
-shift_2 = total_mobility[m_days[25]]- m_vals[25] +0.04
-for index in range(24,len(m_vals)):
-    m_vals[index] += shift_2
 
-plt.scatter(days,total_mobility, label = "Mobility", color = "green", marker = "o", s = 4)
-plt.scatter(m_days, m_vals, label = 'Social Activity', color ='deeppink', marker = "+", s = 60) # normalized to 1
-plt.axvline(x=366, color='darkturquoise', ls='dotted', label = 'End of the year')
-plt.axvspan(153, 490, facecolor='lightsalmon', alpha=0.2,label = 'Shift = +' + str(round(shift_1,2)))
-plt.axvspan(602, 912, facecolor='yellow', alpha=0.2,label = 'Shift = +' + str(round(shift_2,2)))
-plt.legend(loc="lower right")
-plt.title('Mobility & Sociality (shifted) vs Time')
-plt.show()
 
-# ---------------------------------------------------------------------
-# Let's study the anomalous data given by the 7-days moving average (we may see sometimes 7 consecutive data shifted), in order to make our data smoother.
+
+
+
+
+
+
 
 def get_wrong_measurements(index_list):
     
     '''
     Function that marks the shifted measurements.
-
             Parameters:
                     index_list (list): list containing the first index of the total_mobility array in which wrong measurement start.
             Return:
                     errors_days (array): array containing the days related with the wrong mesurement.
                     errors_total_mobility (array) : array containing the values of the wrong measurements.
-
     '''
 
     window = []
     for element in index_list:
         window += range(element, element + 7)
-    return days[window], total_mobility[window]
+    return days[window], final_mobility_smoothed[window]
 
-index_list = [19, 97, 147, 243, 454, 512, 527, 635, 663, 700, 747, 777, 876]
+index_list = [17, 96, 97, 103, 109, 147, 243, 355, 360, 361, 362, 365, 453, 454, 512, 527, 635, 663, 700, 747, 777, 876]
 errors_days, errors_total_mobility = get_wrong_measurements(index_list)
 
-plt.scatter(days,total_mobility, label = "Mobility", color = "green", marker = "o", s = 4)
-plt.scatter(errors_days,errors_total_mobility, label = "Mobility wrong measurements", color = "red", marker = "o", s = 4)
+plt.axvline(x=366, color='darkturquoise', ls='dotted', label = 'End of the year')
+plt.axvline(x=731, color='darkturquoise', ls='dotted')
+plt.xlabel('Number of days from 1 January 2020')
+plt.ylabel('Average number of motor vehicle detected normalized')
+plt.scatter(days,final_mobility_smoothed, label = "Mobility", color = "green", marker = "o", s = 4)
+plt.scatter(errors_days,errors_total_mobility, label = "Interpolation improvements", color = "b", marker = "o", s = 4)
 plt.legend(loc="lower right")
-plt.title('Mobility vs Time')
+plt.title('Remotion of the outliers + Interpolation')
 plt.show()
 
-# remove the shifted data
-index_to_remove = []
-for element in index_list:
-    index_to_remove += range(element, element + 7)
-
-total_mobility = np.delete(total_mobility, index_to_remove)
-days = np.delete(days, index_to_remove)
-    
-#------------------------------------------
-# Interpolation of the (now) missing data.
-
-#operate a shift: necessary to correctly fill the missing point.
-index_to_remove = [element+4 for element in index_to_remove]
-
-def interpolation(x, y, kind):
-    
-    '''
-    Given x, y, and type of the interpolation, perform the scatter interpolation in specific areas of the plot, and return x and y array with both orginal data and interpolation.
-
-            Parameters:
-                    x (np.array): 1-D array containing x values (here, days)
-                    y (np.array): 1-D array containing y values (here, mobility)
-                    kind (str): string that specifies the kind of interpolation, like "linear", "cubic", "quadratic" etc.
-            Return:
-                    x (np.array): 1-D array containing x original data + interpolation.
-                    y (np.array) : 1-D array containing y original data + interpolation.
-
-    '''
-
-    function = interpolate.interp1d(x, y, kind)
-
-    new_x = index_to_remove
-    interpolated_y = function(new_x)
-
-    plt.scatter(days,total_mobility, label = "Original", color = "green", marker = "o", s = 4)
-    plt.scatter(new_x, interpolated_y, label = str(kind) + " interpolation", color = 'red', marker = "o", s = 4)
-    plt.legend(loc="lower right")
-    plt.xlabel('Number of days from 1 January 2020')
-    plt.ylabel('Average number of motor vehicle detected normalized')
-    plt.title(str(kind) + " Interpolation in the missing point")
-    plt.show()
-    
-    y = np.append(y, interpolated_y)
-    x = np.append(x, new_x)
-
-    return x, y
+# da controllare
+#-------------------------------------------------------------------
+# Sociality
+plt.scatter(days, final_mobility_smoothed, label = "Mobility", color = "green", marker = "o", s = 4)
+plt.scatter(m_days, m_vals, label = 'Social Activity', color ='deeppink', marker = "+", s = 60)
+plt.axvline(x=314, color='r', ls='--', label = 'Night curfew and zone colours') # 3th november, curfew, introduzione dei colori
+plt.axvline(x=366, color='darkturquoise', ls='dotted', label = 'End of the year')
+plt.axvline(x=731, color='darkturquoise', ls='dotted')
+plt.axvline(x=70, color='b', ls='--', label='1st Lockdown') # start of the first italian lockdown, 9th march
+plt.axvline(x=125, color='b', ls='--') # end lockdown, 18th may
+plt.title('Mobility & Sociality vs Time')
+plt.xlabel('Number of days from 1 January 2020')
+plt.legend(loc="lower right")
+plt.show()
 
 
-days, total_mobility = interpolation(days, total_mobility, kind = "linear")
-interpolation(days, total_mobility, kind = "quadratic")
-interpolation(days, total_mobility, kind = "cubic")
+#Shifts
+shift_1 = final_mobility_smoothed[165] - m_vals[7] #165 -> 14 giugno
+
+for index in range(7,21): # dall'ottavo elemento in poi shifto tutti i valori di 0,57
+        m_vals[index] += shift_1
+
+plt.scatter(days, final_mobility_smoothed, label = "Mobility", color = "green", marker = "o", s = 4)
+plt.scatter(m_days, m_vals, label = 'Social Activity', color ='deeppink', marker = "+", s = 60) # normalized to 1
+plt.axvline(x=366, color='darkturquoise', ls='dotted', label = 'End of the year')
+plt.axvspan(153, 490, facecolor='lightsalmon', alpha=0.2,label = 'Shift = +' + str(round(shift_1,2)))
+plt.legend(loc="lower right")
+plt.xlabel('Number of days from 1 January 2020')
+plt.title('Mobility & Sociality (shifted) vs Time')
+plt.show()
+
+shift_2 = final_mobility_smoothed[m_days[25]]- m_vals[25] +0.04
+for index in range(24,len(m_vals)):
+    m_vals[index] += shift_2
+
+plt.scatter(days,final_mobility_smoothed, label = "Mobility", color = "green", marker = "o", s = 4)
+plt.scatter(m_days, m_vals, label = 'Social Activity', color ='deeppink', marker = "+", s = 60) # normalized to 1
+plt.axvline(x=366, color='darkturquoise', ls='dotted', label = 'End of the year')
+plt.axvspan(153, 490, facecolor='lightsalmon', alpha=0.2,label = 'Shift = +' + str(round(shift_1,2)))
+plt.axvspan(602, 912, facecolor='yellow', alpha=0.2,label = 'Shift = +' + str(round(shift_2,2)))
+plt.legend(loc="lower right")
+plt.xlabel('Number of days from 1 January 2020')
+plt.title('Mobility & Sociality (shifted) vs Time')
+plt.show()
 

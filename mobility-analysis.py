@@ -65,7 +65,7 @@ trial_df = ordered_df.loc[ordered_df["data"] == "2020-01-01"] # dataset regardin
 # assert len(pd.unique(df['longitudine'])) == len(pd.unique(trial_df['longitudine'])), "Geopoint are not in the same position everyday"
 
 
-# Let's reconstruct an array called Average Monthly Mobolity.
+# Let's reconstruct an array called Average Monthly Mobility.
 # Each element of the 1-D array is associated with a certain geopoint. Let's focus on January.
 january_days= ['2020-01-01','2020-01-02','2020-01-03','2020-01-04','2020-01-05'
 ,'2020-01-06','2020-01-07','2020-01-08','2020-01-09','2020-01-10'
@@ -103,13 +103,13 @@ Bounding_Box_Jan = ((january_df.longitudine.min(),   january_df.longitudine.max(
          january_df.latitudine.min(), january_df.latitudine.max()))
 
 fig, ax = plt.subplots(figsize = (8,7))
-s = simpler_df['Average Monthly Mobility'] # size of the circles are related to the Average Monthly Mobility
-ax.scatter(latitudine_jan, longitudine_jan, zorder=1, alpha= 0.2, c='b', s = s)
+s = simpler_df['Average Monthly Mobility'] #size of the circles are related to the Average Monthly Mobility
+scatter = ax.scatter(latitudine_jan, longitudine_jan, zorder=1, alpha= 0.2, c='b', s = s)
 ax.set_title('Geographical position of autoveichle detectors in the city of Bologna, during January 2020')
-ax.set_xlim(Bounding_Box_Jan[0],Bounding_Box_Jan[1])
-ax.set_ylim(Bounding_Box_Jan[2],Bounding_Box_Jan[3])
-
-ax.imshow(mappa_bologna, zorder=0, extent = Bounding_Box_Jan, aspect= 'equal')
+ax.set_xlim(Bounding_Box[0],Bounding_Box[1])
+ax.set_ylim(Bounding_Box[2],Bounding_Box[3])
+ax.legend(*scatter.legend_elements("sizes", num=5, color = "b"), loc='lower left',labelspacing = 3, borderpad=2, handletextpad =1.5)
+ax.imshow(mappa_bologna, zorder=0, extent = Bounding_Box, aspect= 'equal')
 plt.show()
 
 
