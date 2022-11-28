@@ -82,3 +82,6 @@ Then we procedeed by analyzing the urban vs suburban mobility; for which we cons
 <p align="center">
   <img src="https://github.com/keivan-amini/simplified-covid-model/blob/main/images/Figure_15.png?raw=true" align="centre" alt="map"/>
 </p>
+
+
+TODO
