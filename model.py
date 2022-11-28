@@ -6,18 +6,18 @@ Created on Wed Mar  2 10:38:19 2022
 @author: Giulio Colombini
 """
 
+from turtle import color
 import numpy as np
 from   scipy import stats
 from   tqdm  import tqdm
-from getmobility import get_mobility
+import pandas as pd
 
-# Social activity rate
+
 # The example is a quite strong lockdown 30 days after the introduction of patient zero.
 m_test = (np.array([0, 30, 60, np.inf]), np.array([1., .15, .15, .5]))
-m_imported = get_mobility('https://raw.githubusercontent.com/keivan-amini/simplified-covid-model/main/rilevazione-autoveicoli-tramite-spire-anno-2020_header_mod.csv')
 
 # Hospitalisation fraction of symptomatic patients
-gamma_test = (np.array([0., np.inf]), np.array([.85, .5]))
+gamma_test = (np.array([0., np.inf]), np.array([.85, .5])) 
 
 # Parameters of \rho_E over time
 pars_e_test = (np.array([0., np.inf]), np.array([2.,2.]), np.array([.1,.1]))
@@ -65,7 +65,7 @@ def propagate_forward(t, max_t, donor, acceptors, kernel_tuple, branching_ratios
         a[t + i0 : t + i0 + lk] += r * buffer
 
 def run_simulation(days = 60, dt = 1./24., beta = 1/1.2, alpha = .14, 
-                    N = 886891, norm = False, m = m_imported, gamma = gamma_test, 
+                    N = 886891, norm = False, m = m_test, gamma = gamma_test, 
                     pars_e = pars_e_test, pars_i = pars_i_test, 
                     pars_h = pars_h_test, pars_a = pars_a_test):
     '''
@@ -242,26 +242,31 @@ def run_simulation(days = 60, dt = 1./24., beta = 1/1.2, alpha = .14,
     t = np.array([t for t in range(max_step+1)])
     return (t, S, E, I, H, A, R, TOT)
 
-def test_model(days = 100, dt = 1/48, norm = False):
+
+
+
+def test_model(days = 365, dt = 1/24, norm = False):
     print("Simulate", days, "days with a {:.2f}".format(dt), "day resolution.")
     print("The example is a quite strong lockdown 30 days after the introduction of patient zero.")
-    t,s,e,i,h,a,r,tot = run_simulation(days = 100, dt = dt, norm = norm)
+    t,s,e,i,h,a,r,tot = run_simulation(days = 365, dt = dt, norm = norm)
 #%% Graphics
     from matplotlib import pyplot as plt
      
     plt.figure("Simulation test")
+    # plt.scatter(time-44,hospitalised/886891, label = 'H real', s = 2,color= '#1f77b4')
+
     plt.plot(t * dt,s, label = 'S', linewidth = 2)
     plt.plot(t * dt,e, label = 'E', linewidth = 2)
     plt.plot(t * dt,i, label = 'I', linewidth = 2)
-    plt.plot(t * dt,h, label = 'H', linewidth = 2)
+    plt.plot(t * dt,h, label = 'H', linewidth = 2, color='#ff7f0e')
     plt.plot(t * dt,a, label = 'A', linewidth = 2)
     plt.plot(t * dt,r, label = 'R', linewidth = 2)
-    #plt.plot(t * dt, tot, label = 'TOT')
+    plt.plot(t * dt, tot, label = 'TOT')
     
     plt.legend()
     plt.grid(True)
     if norm:
-        plt.ylim(bottom = 0, top = 0.002255)
+        plt.ylim(bottom = 0, top = 0.0011)
         plt.ylabel('Population Fraction')
     else:
         plt.ylim(bottom = 0, top = 2000)
@@ -274,3 +279,4 @@ def test_model(days = 100, dt = 1/48, norm = False):
 
 if __name__ == "__main__":
     test_model(norm = True)
+
