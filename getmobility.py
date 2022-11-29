@@ -12,7 +12,7 @@ m_vals = np.array([1.00, 1.00, 1.00, 0.24, 0.16, 0.17, 0.18, 0.24, 0.24, 0.24, 0
 m_days = np.array([0, 54, 61, 71, 83, 125, 139, 155, 167, 181, 258, 299, 320, 341, 359, 375, 398, 418, 429, 468, 482, 537, 560, 575, 610, 635, 688, 714, 727, 750, 770, 791, 810, 859, 900, 910])
 
 
-def get_mobility(url, shift = True):
+def get_mobility(url, shift = False):
 
     '''
     Given the url link of the mobility dataframe, return the smoothed and normalized mobility of the dataframe.
@@ -94,25 +94,16 @@ def get_mobility(url, shift = True):
 # Normalization.
     mobility = final_mobility_smoothed/final_mobility_smoothed.max() 
 
-
-
     if shift == True:
-        shift_1 = mobility[165] - m_vals[7] #165 -> 14 giugno
-        for index in range(156, len(mobility)): # shifto tutti i valori di 0,57
+        shift_1 = mobility[165] - m_vals[7] #165 -> 14th June. shift_1 = 0.57
+        for index in range(112, len(mobility)): #156 (day from wich shift starts) - 44 (day-zero pandemic) = 112
             mobility[index] -= shift_1
             if mobility[index] < 0:
-                mobility[index] = 0
-
-
+                mobility[index] = 0.1
 
     days = np.append(days, np.inf) # added inf as last element.
     mobility = np.append(mobility, mobility[-1]) #added last element to the mobility array, since mobility and days must be the same size
-    #number_of_nan = np.count_nonzero(np.isnan(mobility))
-    #print("Il numero di NaN nell'array mobility è " + str(number_of_nan))
-
 
     m = (days, mobility) 
     
-    return m    
-
-
+    return m
